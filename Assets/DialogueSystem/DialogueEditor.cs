@@ -1,101 +1,105 @@
-using UnityEditor;
-using UnityEngine;
-using System.Collections.Generic;
-using UnityEngine.UIElements;
+ï»¿using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
+using UnityEngine.UIElements;
 
-public class DialogueEditor : EditorWindow
+namespace DialogueSystem
 {
-    private VisualElement m_RightPane;
-
-    [MenuItem("Window/DialogueEditor")]
-    public static void ShowWindow()
+    public class DialogueEditor : EditorWindow
     {
-        EditorWindow.GetWindow(typeof(DialogueEditor));
-    }
+        private VisualElement _rightPane;
+        private ListView _leftPane;
 
-    public void CreateGUI()
-    {
-        //½ºÇÁ¶óÀÌÆ® ¸®½ºÆ®¸¦ ³ªÅ¸³»·Á¸é AssetDatabase ÇÔ¼ö¸¦ »ç¿ëÇÏ¿© ÇÁ·ÎÁ§Æ®ÀÇ ¸ðµç ½ºÇÁ¶óÀÌÆ®¸¦ Ã£À¸½Ê½Ã¿À.
-        // Get a list of all sprites in the project
-        var allObjectGuids = AssetDatabase.FindAssets("t:Dialogue");
-        var allObjects = new List<Dialogue>();
-        foreach (var guid in allObjectGuids)
+        [MenuItem("Window/DialogueEditor")]
+        public static void ShowWindow()
         {
-            allObjects.Add(AssetDatabase.LoadAssetAtPath<Dialogue>(AssetDatabase.GUIDToAssetPath(guid)));
+            EditorWindow.GetWindow(typeof(DialogueEditor));
         }
 
-        // Create a two-pane view with the left pane being fixed with
-        var splitView = new TwoPaneSplitView(0, 250, TwoPaneSplitViewOrientation.Horizontal);
+        public void CreateGUI()
+        {
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ AssetDatabase ï¿½Ô¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ Ã£ï¿½ï¿½ï¿½Ê½Ã¿ï¿½.
+            // Get a list of all sprites in the project
+            var allObjectGuids = AssetDatabase.FindAssets("t:Dialogue");
+            var allObjects = new List<Dialogue>();
+            foreach (var guid in allObjectGuids)
+            {
+                allObjects.Add(AssetDatabase.LoadAssetAtPath<Dialogue>(AssetDatabase.GUIDToAssetPath(guid)));
+            }
 
-        // Add the view to the visual tree by adding it as a child to the root element
-        rootVisualElement.Add(splitView);
+            // Create a two-pane view with the left pane being fixed with
+            var splitView = new TwoPaneSplitView(0, 250, TwoPaneSplitViewOrientation.Horizontal);
 
-        // A TwoPaneSplitView always needs exactly two child elements
-        var leftPane = new ListView();
-        splitView.Add(leftPane);
+            // Add the view to the visual tree by adding it as a child to the root element
+            rootVisualElement.Add(splitView);
+
+            // A TwoPaneSplitView always needs exactly two child elements
+            _leftPane = new ListView();
+            splitView.Add(_leftPane);
         
 
-        // Initialize the list view with all sprites' names
-        leftPane.makeItem = () => new Label();
-        leftPane.bindItem = (item, index) => { (item as Label).text = allObjects[index].name; };
-        leftPane.itemsSource = allObjects;
+            // Initialize the list view with all sprites' names
+            _leftPane.makeItem = () => new Label();
+            _leftPane.bindItem = (item, index) => { ((item as Label)!).text = allObjects[index].name; };
+            _leftPane.itemsSource = allObjects;
 
-        // React to the user's selection
-        leftPane.onSelectionChange += OnDialogueSelectionChange;
+            // React to the user's selection
+            _leftPane.selectionChanged += OnDialogueSelectionChange;
 
-        m_RightPane = new VisualElement();
-        splitView.Add(m_RightPane);
-    }
-
-    private void UpdateSelectedDialogueView(Dialogue dialogue)
-    {
-        // Clear all previous content from the pane
-        m_RightPane.Clear();
-
-        // Add a new Image control and display the sprite
-        var dialogueText = new Label(dialogue._name);
-
-        // Add the Image control to the right-hand pane
-        m_RightPane.Add(dialogueText);
-
-        var contentsView = new ScrollView();
-        m_RightPane.Add(contentsView);
-        for (int i = 0; i < dialogue._contents.Length; i++)
-        {
-            var content = new Label(dialogue._contents[i]);
-            contentsView.Add(content);
+            _rightPane = new VisualElement();
+            splitView.Add(_rightPane);
         }
 
-        var branchView = new ScrollView(ScrollViewMode.Horizontal);
-        m_RightPane.Add(branchView);
-        for (int i = 0; i < dialogue._branchs.Length; i++)
+        private void UpdateSelectedDialogueView(Dialogue dialogue)
         {
-            var branch = dialogue._branchs[i];
-            var btn = new Button(() => { UpdateSelectedDialogueView(branch); });
-            btn.text = branch._name;
-            branchView.Add(btn);
-            //branchView.Add(new Label(branch._name));
-        }        
-    }
+            // Clear all previous content from the pane
+            _rightPane.Clear();
 
-    private void OnDialogueSelectionChange(IEnumerable<object> selectedItems)
-    {
-        // Clear all previous content from the pane
-        m_RightPane.Clear();
+            // Add a new Image control and display the sprite
+            var dialogueText = new Label(dialogue.name);
 
-        var dialogue = selectedItems.First() as Dialogue;
-        if (dialogue == null)
-            return;
+            // Add the Image control to the right-hand pane
+            _rightPane.Add(dialogueText);
 
-        UpdateSelectedDialogueView(dialogue);
+            var contentsView = new ScrollView();
+            _rightPane.Add(contentsView);
+            foreach (var t in dialogue.contents)
+            {
+                var content = new Label(t);
+                contentsView.Add(content);
+            }
+
+            var branchView = new ScrollView(ScrollViewMode.Horizontal);
+            _rightPane.Add(branchView);
+            foreach (var branch in dialogue.branchs)
+            {
+                var branch1 = branch;
+                var btn = new Button(() => { UpdateSelectedDialogueView(branch1); })
+                {
+                    text = branch.title
+                };
+                branchView.Add(btn);
+            }        
+        }
+
+        private void OnDialogueSelectionChange(IEnumerable<object> selectedItems)
+        {
+            // Clear all previous content from the pane
+            _rightPane.Clear();
+
+            var dialogue = selectedItems.First() as Dialogue;
+            if (dialogue is  null)
+                return;
+
+            UpdateSelectedDialogueView(dialogue);
 
 
-    }
+        }
 
-    void OnGUI()
-    {
+        void OnGUI()
+        {
        
+        }
     }
+    ;
 }
-;

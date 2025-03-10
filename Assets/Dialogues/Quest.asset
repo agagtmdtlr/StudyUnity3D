@@ -12,11 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d5906014053e3340b58d32a0cc59be2, type: 3}
   m_Name: Quest
   m_EditorClassIdentifier: 
-  _name: "\uD018\uC2A4\uD2B8"
-  _contents:
-  - "\uAC04\uB2E8\uD55C \uBD80\uD0C1\uD558\uB098 \uD560\uAC8C\uC694"
-  - "\uC74C\uC2DD\uC744 \uAC00\uC838\uB2E4 \uC8FC\uC138\uC694"
-  - "\uACFC\uC77C\uC774\uBA74 \uC88B\uACA0\uC5B4\uC694"
-  _branchs:
+  title: "\uD018\uC2A4\uD2B8"
+  contents:
+  - "\uACFC\uC77C\uC774 \uB108\uBB34 \uBA39\uACE0 \uC2F6\uC5B4"
+  - "\uB204\uAC00 \uACFC\uC77C\uC880 \uAD6C\uD574\uC8FC\uBA74 \uC88B\uACA0\uC5B4"
+  branchs:
   - {fileID: 11400000, guid: bec48067f6fa5384d99dd59419a00d58, type: 2}
   - {fileID: 11400000, guid: 0235235760362e04eb5580a90946cce5, type: 2}

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d5906014053e3340b58d32a0cc59be2, type: 3}
   m_Name: Refuse
   m_EditorClassIdentifier: 
-  _name: "\uAC70\uC808"
-  _contents:
-  - "\uC544\uC27D\uB124\uC694 \uB2E4\uC74C\uC5D0\uB294 \uB3C4\uC640\uC8FC\uC138\uC694"
-  _branchs: []
+  title: "\uAC70\uC808"
+  contents:
+  - "\uC544\uC27D\uB124 \uB3C4\uC640\uC8FC\uAE38 \uBC14\uB7AC\uB294\uB370"
+  branchs: []

@@ -1,11 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Dialogue", menuName = "ScriptableObjects/Dialogue", order = 1)]
-public class Dialogue : ScriptableObject
+namespace DialogueSystem
 {
-    public string _name;
-    public string[] _contents;
-    public Dialogue[] _branchs;
+    [CreateAssetMenu(fileName = "Dialogue", menuName = "ScriptableObjects/Dialogue", order = 1)]
+    public class Dialogue : ScriptableObject
+    {
+        public string title;
+        public string[] contents;
+        public Dialogue[] branchs;
+    }
 }
