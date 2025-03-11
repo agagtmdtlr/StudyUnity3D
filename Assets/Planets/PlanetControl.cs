@@ -1,5 +1,3 @@
-using System;
-using TreeEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -11,6 +9,7 @@ namespace Planets
         [FormerlySerializedAs("Radius")] public  float radius;
         [FormerlySerializedAs("RevolveSpeed")] public  float revolveSpeed;
         [FormerlySerializedAs("OrbitSpeed")] public  float orbitSpeed =1f;
+        
         private float _orbit;
 
         private void Awake()
@@ -22,7 +21,7 @@ namespace Planets
         private void Update()
         {
 
-            if (target != null)
+            if (target is not null)
             {
                 _orbit += Time.deltaTime * orbitSpeed;
                 var localPosFromTarget = Quaternion.Euler( Vector3.up * _orbit) * Vector3.forward * radius;
