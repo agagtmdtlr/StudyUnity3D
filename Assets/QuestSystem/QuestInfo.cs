@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class QuestInfo : MonoBehaviour
 {
+    public Animator animator;
+
     // Start is called before the first frame update
     void Start()
     {
