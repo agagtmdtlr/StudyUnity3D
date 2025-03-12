@@ -2,19 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuestInfo : MonoBehaviour
+public enum EProgressionState
 {
-    public Animator animator;
+    REQUIREMENTS_NOT_MET,
+    CAN_START,
+    IN_PROGRESS, // quest step quest step
+    CAN_FINISH,
+    FINISHED
+}
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+// static information
+public class QuestInfo : ScriptableObject
+{
+    string id;
+    string displayName;
+
+    public QuestInfo[] requirement; // ¼±Çà Äù
+    public GameObject[] questSteps;
+
+    public QuestReward reward;
 }
