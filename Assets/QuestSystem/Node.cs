@@ -5,8 +5,7 @@ using UnityEngine.UIElements;
 
 public class Node
 {
-    NodeGraphEditor editor;
-
+    
     static int id;
 
     public Rect rect;
@@ -14,6 +13,8 @@ public class Node
     private string title;
     private string content = "content";
     private Vector2 offset;
+
+    private VisualElement visualElement;
 
 
     // 연결된 노드 리스트
@@ -28,12 +29,116 @@ public class Node
     private Color bodyColor = new Color(0.5f, 0.7f, 0.5f);   // 본문 색상
     private Color bottomColor = new Color(0.8f, 0.3f, 0.3f); // 바닥 색상
 
-    public Node(NodeGraphEditor editor, Vector2 position)
+    public Node( Rect position)
     {
-        this.editor = editor;
-        rect = new Rect(position.x, position.y, 100, 100);
+        rect = position;
         title = $"Node {id++}";
+
+        // VisualElement 생성
+        visualElement = new VisualElement
+        {
+            style =
+            {
+                width = rect.width,
+                height = rect.height,
+                position = Position.Absolute,
+                left = rect.x,
+                top = rect.y,
+            }
+        };
+
+        visualElement.RegisterCallback<MouseDownEvent>(OnMouseDownEvent);
+        visualElement.RegisterCallback<MouseMoveEvent>(OnMouseMoveEvent);
+        visualElement.RegisterCallback<MouseUpEvent>(OnMouseUpEvent);
     }
+
+    public VisualElement GetVisualElement()
+    {
+        UpdateVisualElement();
+        return visualElement;
+    }
+
+    public void UpdateVisualElement()
+    {
+        visualElement.Clear();
+
+        // 헤더 그리기
+        var header = new VisualElement
+        {
+            style =
+            {
+                backgroundColor = headerColor,
+                height = HEADER_HEIGHT,
+            }
+        };
+        header.Add(new Label(title) { style = { color = Color.white } });
+
+        // 본문 그리기
+        var body = new VisualElement
+        {
+            style =
+            {
+                backgroundColor = bodyColor,
+                height = BODY_HEIGHT,
+            }
+        };
+
+        // 본문 영역에 대한 텍스트 필드 또는 레이블
+        if (isEditing)
+        {
+            var textField = new TextField
+            {
+                value = title,
+                style =
+                {
+                    marginLeft = 10,
+                    marginTop = 10,
+                    marginRight = 10,
+                    height = BODY_HEIGHT - 20,
+                }
+            };
+            textField.RegisterValueChangedCallback(e => title = e.newValue);
+            body.Add(textField);
+        }
+        else
+        {
+            body.Add(new Label(title) { style = { marginLeft = 10, marginTop = 10 } });
+        }
+
+        // 바닥 그리기
+        var bottom = new VisualElement
+        {
+            style =
+            {
+                backgroundColor = bottomColor,
+                height = BOTTOM_HEIGHT,
+            }
+        };
+
+        visualElement.Add(header);
+        visualElement.Add(body);
+        visualElement.Add(bottom);
+    }
+
+    public void OnMouseDownEvent(MouseDownEvent evt)
+    {
+        offset = evt.localMousePosition; // 마우스 위치
+    }
+
+    public void OnMouseMoveEvent(MouseMoveEvent evt)
+    {
+        if (evt.pressedButtons == 1) // Left mouse button
+        {
+            rect.position += evt.mouseDelta; // 위치 이동
+            UpdateVisualElement(); // 위치 업데이트
+        }
+    }
+
+    public void OnMouseUpEvent(MouseUpEvent evt)
+    {
+        // 추가 로직이 필요한 경우 여기에 작성
+    }
+
     public void Connect(Node targetNode)
     {
         if (!connectedNodes.Contains(targetNode))

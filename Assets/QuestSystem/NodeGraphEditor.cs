@@ -6,6 +6,7 @@ using System;
 using UnityEngine.UIElements;
 using UnityEditor.Experimental.GraphView;
 using JetBrains.Annotations;
+using Unity.VisualScripting;
 
 
 public class NodeGraphEditor : EditorWindow
@@ -18,6 +19,7 @@ public class NodeGraphEditor : EditorWindow
 
     private List<Node> nodes = new List<Node>();
     public Node selectedNodeForMove;
+    public Node selectedNode;
     private Node selectedNodeForConnection;
     private Node selectedNodeForEditing;
 
@@ -30,7 +32,66 @@ public class NodeGraphEditor : EditorWindow
     [MenuItem("Window/NodeGraphEditor")]
     public static void ShowWindow()
     {
-        GetWindow<NodeGraphEditor>("NodeGraphEditor");
+        NodeGraphEditor wnd = GetWindow<NodeGraphEditor>();
+        wnd.titleContent = new GUIContent("Node Graph");
+        wnd.Show();
+    }
+
+    public void OnEnable()
+    {
+        // VisualElement 초기화
+        var root = rootVisualElement;
+
+        // 클릭 이벤트 처리
+        root.RegisterCallback<MouseDownEvent>(OnMouseDown);
+        root.RegisterCallback<MouseMoveEvent>(OnMouseMove);
+    }
+    private void OnMouseMove(MouseMoveEvent evt)
+    {
+        if (selectedNode != null)
+        {
+            selectedNode.OnMouseDrag(evt.localMousePosition);
+        }
+    }
+
+    private void OnMouseDown(MouseDownEvent evt)
+    {
+        if (evt.button == 0) // Left mouse button
+        {
+            Vector2 mousePos = evt.localMousePosition;
+
+            foreach (var node in nodes)
+            {
+                if (node.rect.Contains(mousePos))
+                {
+                    // 헤더 클릭
+                    if (node.IsHeaderClicked(mousePos))
+                    {
+                        selectedNode = node;
+                        node.OnMouseDown(evt.localMousePosition);
+                    }
+                    // 본문 클릭
+                    else if (node.IsBodyClicked(mousePos))
+                    {
+                        node.StartEditing();
+                    }
+                    // 바닥 클릭
+                    else if (node.IsBottomClicked(mousePos))
+                    {
+                        selectedNodeForConnection = node;
+                    }
+
+                    evt.StopPropagation();
+                    return;
+                }
+            }
+
+            Node newNode = new Node(new Rect(mousePos.x, mousePos.y, 100, 100));
+            nodes.Add(newNode);
+            var root = rootVisualElement;
+            root.Add(newNode.GetVisualElement());
+            evt.StopPropagation();
+        }
     }
 
     private void OnGUI()
@@ -64,7 +125,8 @@ public class NodeGraphEditor : EditorWindow
 
     public void CreateNode(Vector2 pos)
     {
-        Node newNode = new Node(this, pos);
+        Rect rect = new Rect(pos, new Vector2(100, 100));
+        Node newNode = new Node(rect);
         nodes.Add(newNode);
     }
 
